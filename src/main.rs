@@ -1,3 +1,4 @@
+use rand::Rng;
 use std::io;
 fn main() {
     const MAX_WIDTH: usize = 1_000_000;
@@ -21,21 +22,9 @@ fn main() {
         }
     };
 
-    // let mut v: Vec<i32> = Vec::new();
-    //
-    // for number in 0..width {
-    //     v.push(number as i32);
-    // }
-    //
-    // for (i, &item) in v.iter().enumerate() {
-    //     println!("{i}:{item}");
-    // }
-
-    // let mut v: Vec<Vec<f32>> = Vec::new();
-    // for number in 0..width {
-    //     println!("{number}");
-    //     let sub_list = &mut v[number];
-    //     let elem = sub_list.get(0);
-    //     println!("{elem}");
-    // }
+    let mut v: Vec<f32> = Vec::with_capacity(width);
+    for _ in 0..v.capacity() {
+        v.push(0.0);
+    }
+    let secret_number = rand::thread_rng().gen_range(1..=100);
 }
