@@ -1,30 +1,40 @@
-use rand::Rng;
-use std::io;
-fn main() {
-    const MAX_WIDTH: usize = 1_000_000;
-    const DEFAULT: usize = 10;
+use std::env;
 
-    let mut width = String::new();
-    io::stdin()
-        .read_line(&mut width)
-        .expect("Failed to read line");
+mod noise;
 
-    // if weird value, send back 10
-    let width: usize = match width.trim().parse() {
-        Ok(num) if num <= MAX_WIDTH => num,
-        Ok(_) => {
-            println!("Number is too large, using default");
-            DEFAULT
-        }
-        Err(_) => {
-            println!("Expected a number, got invalid value");
-            DEFAULT
-        }
-    };
+fn main() -> Result<(), String> {
+    let args: Vec<String> = env::args().collect();
+    let config = parse_arguments(args)?;
 
-    let mut v: Vec<f32> = Vec::with_capacity(width);
-    for _ in 0..v.capacity() {
-        v.push(0.0);
+    let val = noise::noise(0.0, 0.0);
+
+    Ok(())
+}
+
+fn parse_arguments(args: Vec<String>) -> Result<Config, String> {
+    if args.len() < 4 {
+        return Err("Not enough arguments".into());
     }
-    let secret_number = rand::thread_rng().gen_range(1..=100);
+
+    let width = args[1].parse().map_err(|_| "Bad width")?;
+    let height = args[2].parse().map_err(|_| "Bad height")?;
+    let frequency = args[3].parse().map_err(|_| "Bad frequency")?;
+
+    for i in 0..5 {
+        for j in 0..5 {
+            let val = noise::grad_dir_8(i, j, 0);
+            println!("{} {}", val.0, val.1);
+        }
+    }
+
+    Ok(Config {
+        width: width,
+        height: height,
+        frequency: frequency,
+    })
+}
+struct Config {
+    width: usize,
+    height: usize,
+    frequency: f64,
 }
