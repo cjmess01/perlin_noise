@@ -7,10 +7,6 @@ fn main() -> Result<(), String> {
     let args: Vec<String> = env::args().collect();
     let config = parse_arguments(args)?;
 
-    println!("{} {} {}", config.width, config.height, config.frequency);
-
-    let mut max_val = 0.0;
-    let mut min_val = 0.0;
     // This creates a png and fills it with the info
     let mut img = ImageBuffer::new(config.width as u32, config.height as u32);
     for (x, y, pixel) in img.enumerate_pixels_mut() {
@@ -28,8 +24,6 @@ fn main() -> Result<(), String> {
         *pixel = Rgb([r_height, g_height, b_height]);
     }
     img.save("output.png").unwrap();
-    println!("{max_val}");
-    println!("{min_val}");
 
     Ok(())
 }

@@ -6,10 +6,10 @@ pub fn noise(x: f64, y: f64, seed: u32) -> Result<f64, String> {
     let d = (x.ceil(), y.ceil());
 
     // Because I am doing copies as i32, the tuple values aren't actually moved
-    let va = grad_dir_8(a.0 as i32, a.1 as i32, seed);
-    let vb = grad_dir_8(b.0 as i32, b.1 as i32, seed);
-    let vc = grad_dir_8(c.0 as i32, c.1 as i32, seed);
-    let vd = grad_dir_8(d.0 as i32, d.1 as i32, seed);
+    let va = grad_dir_16(a.0 as i32, a.1 as i32, seed);
+    let vb = grad_dir_16(b.0 as i32, b.1 as i32, seed);
+    let vc = grad_dir_16(c.0 as i32, c.1 as i32, seed);
+    let vd = grad_dir_16(d.0 as i32, d.1 as i32, seed);
 
     let da = distance(x, y, a.0, a.1);
     let db = distance(x, y, b.0, b.1);
@@ -57,19 +57,27 @@ fn distance(x1: f64, y1: f64, x2: f64, y2: f64) -> (f64, f64) {
 }
 
 // given a vertex meet, return a gradient
-fn grad_dir_8(i: i32, j: i32, seed: u32) -> (f64, f64) {
-    GRAD8[grad_index_8(i, j, seed) as usize]
+fn grad_dir_16(i: i32, j: i32, seed: u32) -> (f64, f64) {
+    GRAD16[grad_index_16(i, j, seed) as usize]
 }
 
-const GRAD8: [(f64, f64); 8] = [
-    (1.0, 0.0),       // E
-    (0.707, 0.707),   // NE
-    (0.0, 1.0),       // N
-    (-0.707, 0.707),  // NW
-    (-1.0, 0.0),      // W
-    (-0.707, -0.707), // SW
-    (0.0, -1.0),      // S
-    (0.707, -0.707),  // SE
+const GRAD16: [(f64, f64); 16] = [
+    (1.0, 0.0),         // E
+    (0.707, 0.707),     // NE
+    (0.0, 1.0),         // N
+    (-0.707, 0.707),    // NW
+    (-1.0, 0.0),        // W
+    (-0.707, -0.707),   // SW
+    (0.0, -1.0),        // S
+    (0.707, -0.707),    // SE
+    (0.9239, 0.3827),   // ENE
+    (-0.9239, 0.3827),  // WNW
+    (-0.9239, -0.3827), // WSW
+    (0.9239, -0.3827),  // ESE
+    (0.3827, 0.9239),   // NNE
+    (-0.3827, 0.9239),  // NNW
+    (-0.3827, -0.9239), // SSW
+    (0.3827, -0.9239),  // SSE
 ];
 
 fn mix32(mut x: u32) -> u32 {
@@ -81,9 +89,9 @@ fn mix32(mut x: u32) -> u32 {
     x
 }
 
-fn grad_index_8(i: i32, j: i32, seed: u32) -> u8 {
+fn grad_index_16(i: i32, j: i32, seed: u32) -> u8 {
     let iu = i as u32;
     let ju = j as u32;
     let h = mix32(iu.wrapping_mul(0x9E37_79B9) ^ ju.wrapping_mul(0x85EB_CA6B) ^ seed);
-    (h & 7) as u8 // 0..7
+    (h & 15) as u8 // 0..15
 }
